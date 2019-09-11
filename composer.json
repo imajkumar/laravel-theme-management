@@ -1,0 +1,47 @@
+{
+    "name": "ayra/laravel-themes",
+    "description": "Theme will help you organize your themes inside Laravel projects easily and maintain its related assets, layouts and partials for the theme in single directory. (Based on teepluss/theme)",
+    "keywords": ["laravel", "theme", "layout", "asset", "widget"],
+    "homepage": "https://github.com/imajkumar/laravel-theme",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Teepluss",
+            "email": "admin@laravel.in.th"
+        },
+        {
+            "name": "ayra",
+            "email": "info@indis.com.ar"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0",
+        "jeremeamia/superclosure": "^2.0"
+    },
+    "require-dev": {
+        "illuminate/support": ">=5.0.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "Ayra\\Theme\\": "src/"
+        },
+        "classmap": [
+            "src/Exceptions.php"
+        ],
+        "files": [
+            "src/helpers.php"
+        ]
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Ayra\\Theme\\ThemeServiceProvider"
+            ],
+            "aliases": {
+                "Theme": "Ayra\\Theme\\Facades\\Theme"
+            }
+        }
+    },
+    "minimum-stability": "dev"
+}
