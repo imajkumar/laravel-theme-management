@@ -1,4 +1,4 @@
-<?php namespace Facuz\Theme;
+<?php namespace Ayra\Theme;
 
 use Closure;
 use ReflectionClass;
@@ -10,8 +10,8 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\View\Compilers\BladeCompiler;
 use Illuminate\Database\Eloquent\Collection;
 use Symfony\Component\HttpFoundation\Cookie;
-use Facuz\Theme\Contracts\Theme as ThemeContract;
-use Facuz\Theme\Manifest;
+use Ayra\Theme\Contracts\Theme as ThemeContract;
+use Ayra\Theme\Manifest;
 use Illuminate\Support\Arr;
 
 class Theme implements ThemeContract
@@ -31,7 +31,7 @@ class Theme implements ThemeContract
     /**
      * Manifest.
      *
-     * @var \Facuz\Theme\Manifest
+     * @var \Ayra\Theme\Manifest
      */
     protected $manifest;
 
@@ -59,7 +59,7 @@ class Theme implements ThemeContract
     /**
      * Asset.
      *
-     * @var \Facuz\Assets
+     * @var \Ayra\Assets
      */
     protected $asset;
 
@@ -73,7 +73,7 @@ class Theme implements ThemeContract
     /**
      * Breadcrumb.
      *
-     * @var \Facuz\Breadcrumb
+     * @var \Ayra\Breadcrumb
      */
     protected $breadcrumb;
 
@@ -155,12 +155,12 @@ class Theme implements ThemeContract
      * @param  \Illuminate\Config\Repository $config
      * @param  \Illuminate\Events\Dispatcher $events
      * @param  \Illuminate\View\Factory $view |
-     * @param  \Facuz\Theme\asset $asset
+     * @param  \Ayra\Theme\asset $asset
      * @param  \Illuminate\Filesystem\Filesystem $files
-     * @param  \Facuz\Breadcrumb|\Facuz\Theme\Breadcrumb $breadcrumb
-     * @param  \Facuz\Theme\Manifest $manifest
+     * @param  \Ayra\Breadcrumb|\Ayra\Theme\Breadcrumb $breadcrumb
+     * @param  \Ayra\Theme\Manifest $manifest
      *
-     * @return \Facuz\Theme\Theme
+     * @return \Ayra\Theme\Theme
      */
     public function __construct(Repository $config,
                                 Dispatcher $events,
@@ -787,7 +787,7 @@ class Theme implements ThemeContract
      * @param  string $className
      * @param  array $attributes
      * @throws UnknownWidgetClassException
-     * @return Facuz\Theme\Widget
+     * @return Ayra\Theme\Widget
      */
     public function widget($className, $attributes = array())
     {
@@ -948,7 +948,7 @@ class Theme implements ThemeContract
     /**
      * Return asset instance.
      *
-     * @return \Facuz\Theme\Asset
+     * @return \Ayra\Theme\Asset
      */
     public function asset()
     {
@@ -958,7 +958,7 @@ class Theme implements ThemeContract
     /**
      * Return breadcrumb instance.
      *
-     * @return \Facuz\Theme\Breadcrumb
+     * @return \Ayra\Theme\Breadcrumb
      */
     public function breadcrumb()
     {
