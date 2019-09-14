@@ -40,7 +40,7 @@ Theme has many features to help you get started with Laravel
 To get the latest version of laravel-themes simply require it in your `composer.json` file.
 
 ~~~json
-"Ayra/laravel-themes": "^3.1"
+ "ayra/laravel-themes": "dev-master",
 ~~~
 
 You'll then need to run `composer install` to download it and have the autoloader updated.
