@@ -7,17 +7,14 @@
     "license": "MIT",
     "authors": [
         {
-            "name": "Teepluss",
-            "email": "admin@laravel.in.th"
-        },
-        {
-            "name": "ayra",
-            "email": "info@indis.com.ar"
+            "name": "Ajay Kumar",
+            "email": "ajayit2020@gmail.com"
         }
+       
     ],
     "require": {
         "php": ">=7.2.0",
-        "jeremeamia/superclosure": "^2.0"
+        "opis/closure": "^3.5@dev"
     },
     "require-dev": {
         "illuminate/support": ">=5.0.1"
