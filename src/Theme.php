@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\Cookie;
 use Ayra\Theme\Contracts\Theme as ThemeContract;
 use Ayra\Theme\Manifest;
 use Illuminate\Support\Arr;
-
+use Opis\Closure\SerialiazbleClosure;
 class Theme implements ThemeContract
 {
     /**
