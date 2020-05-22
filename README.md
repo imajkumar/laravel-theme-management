@@ -36,7 +36,10 @@ Theme has many features to help you get started with Laravel
 
 
 ## Installation
-
+~~~
+composer require ayra/laravel-themes
+~~~
+or 
 To get the latest version of laravel-themes simply require it in your `composer.json` file.
 
 ~~~json
