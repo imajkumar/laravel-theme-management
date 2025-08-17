@@ -1,8 +1,8 @@
 {
     "name": "ayra/laravel-themes",
-    "description": "Theme will help you organize your themes inside Laravel projects easily and maintain its related assets, layouts and partials for the theme in single directory. (Based on teepluss/theme)",
-    "keywords": ["laravel", "theme", "layout", "asset", "widget"],
-    "homepage": "https://github.com/imajkumar/laravel-theme-management",
+    "description": "A powerful theme management system for Laravel 12.x that helps you organize themes, layouts, assets, and widgets efficiently. Based on teepluss/theme with modern Laravel compatibility.",
+    "keywords": ["laravel", "theme", "layout", "asset", "widget", "laravel12", "themes"],
+    "homepage": "https://github.com/ayra/laravel-themes",
     "type": "library",
     "license": "MIT",
     "authors": [
@@ -10,14 +10,15 @@
             "name": "Ajay Kumar",
             "email": "ajayit2020@gmail.com"
         }
-       
     ],
     "require": {
-        "php": ">=7.2.0",
-        "opis/closure": "^3.5@dev"
+        "php": "^8.2",
+        "laravel/framework": "^12.0",
+        "opis/closure": "^3.6"
     },
     "require-dev": {
-        "illuminate/support": "^9.19|^10.0"
+        "phpunit/phpunit": "^10.0",
+        "orchestra/testbench": "^9.0"
     },
     "autoload": {
         "psr-4": {
@@ -30,6 +31,25 @@
             "src/helpers.php"
         ]
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Ayra\\Theme\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "phpunit",
+        "test:coverage": "phpunit --coverage-html coverage",
+        "test:coverage-text": "phpunit --coverage-text",
+        "test:coverage-clover": "phpunit --coverage-clover coverage.xml",
+        "lint": "php-cs-fixer fix --dry-run --diff",
+        "lint:fix": "php-cs-fixer fix",
+        "security": "composer audit",
+        "check": [
+            "@lint",
+            "@security",
+            "@test"
+        ]
+    },
     "extra": {
         "laravel": {
             "providers": [
@@ -40,5 +60,10 @@
             }
         }
     },
-    "minimum-stability": "dev"
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "config": {
+        "sort-packages": true,
+        "optimize-autoloader": true
+    }
 }

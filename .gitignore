@@ -1,6 +1,66 @@
-vendor/
-composer.phar
+# Dependencies
+/vendor/
+/node_modules/
+
+# Composer
 composer.lock
+composer.phar
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# IDE and Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
 .DS_Store
-.svn
-.idea
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Testing
+.phpunit.cache/
+coverage/
+.phpunit.result.cache
+
+# Build artifacts
+/build/
+/dist/
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+*.cache
+
+# Laravel specific
+bootstrap/cache/
+storage/
+.env.example
+
+# Theme assets (if generated during development)
+public/themes/*/assets/dist/
+public/themes/*/assets/build/
+
+# Backup files
+*.bak
+*.backup
+*.old
+
+# Archive files
+*.zip
+*.tar.gz
+*.rar
+
+# Documentation build
+/docs/_build/
+/docs/build/

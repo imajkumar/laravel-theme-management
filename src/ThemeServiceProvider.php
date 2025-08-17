@@ -33,7 +33,6 @@ class ThemeServiceProvider extends ServiceProvider {
 		$this->addToBlade(['dv', 'dd(get_defined_vars()[%s]);', 'dd(get_defined_vars()["__data"]);']);
 		$this->addToBlade(['d', 'dump(%s);']);
 
-
 		$this->addToBlade(['get', 'Theme::get(%s);']);
 		$this->addToBlade(['getIfHas', 'Theme::has(%1$s) ? Theme::get(%1$s) : ""']);
 
@@ -78,16 +77,21 @@ class ThemeServiceProvider extends ServiceProvider {
 		$this->registerThemeList();
 		$this->registerThemeDuplicate();
 		$this->registerThemeDestroy();
+		$this->registerThemeExport();
+		$this->registerThemeImport();
+		$this->registerThemeBackup();
 
 		// Assign commands:
-		$this->commands(
-						'theme.create',
-						'theme.widget',
-						'theme.list',
-						'theme.duplicate',
-						'theme.destroy'
-						);
-
+		$this->commands([
+			'theme.create',
+			'theme.widget',
+			'theme.list',
+			'theme.duplicate',
+			'theme.destroy',
+			'theme.export',
+			'theme.import',
+			'theme.backup'
+		]);
 	}
 
 	/**
@@ -104,7 +108,6 @@ class ThemeServiceProvider extends ServiceProvider {
 			);
 		});  
 	}
-
 
 	/**
 	 * Register asset provider.
@@ -239,6 +242,45 @@ class ThemeServiceProvider extends ServiceProvider {
 	}
 
 	/**
+	 * Register theme export.
+	 *
+	 * @return void
+	 */
+	public function registerThemeExport()
+	{
+		$this->app->singleton('theme.export', function($app)
+		{
+			return new Commands\ThemeExportCommand($app['config'], $app['files']);
+		});
+	}
+
+	/**
+	 * Register theme import.
+	 *
+	 * @return void
+	 */
+	public function registerThemeImport()
+	{
+		$this->app->singleton('theme.import', function($app)
+		{
+			return new Commands\ThemeImportCommand($app['config'], $app['files']);
+		});
+	}
+
+	/**
+	 * Register theme backup.
+	 *
+	 * @return void
+	 */
+	public function registerThemeBackup()
+	{
+		$this->app->singleton('theme.backup', function($app)
+		{
+			return new Commands\ThemeBackupCommand($app['config'], $app['files']);
+		});
+	}
+
+	/**
 	 * Get the services provided by the provider.
 	 *
 	 * @return array
@@ -247,5 +289,4 @@ class ThemeServiceProvider extends ServiceProvider {
 	{
 		return array('asset', 'theme', 'widget', 'breadcrumb');
 	}
-
 }

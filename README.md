@@ -1,849 +1,1729 @@
-# Theme Management for Laravel
+# Laravel Themes - Theme Management System for Laravel 12.x
 
-Laravel-Theme is a theme management for Laravel 10.x, it is the easiest way to organize your skins, layouts and assets.
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/ayra/laravel-themes.svg)](https://packagist.org/packages/ayra/laravel-themes)
+[![Total Downloads](https://img.shields.io/packagist/dt/ayra/laravel-themes.svg)](https://packagist.org/packages/ayra/laravel-themes)
+[![License](https://img.shields.io/packagist/l/ayra/laravel-themes.svg)](https://packagist.org/packages/ayra/laravel-themes)
+[![PHP Version](https://img.shields.io/packagist/php-v/ayra/laravel-themes.svg)](https://packagist.org/packages/ayra/laravel-themes)
+[![Laravel Version](https://img.shields.io/packagist/dependency-v/ayra/laravel-themes/laravel/framework.svg)](https://packagist.org/packages/ayra/laravel-themes)
 
-This package is based on [teepluss\theme](https://github.com/teepluss/laravel-theme/)
+A powerful and modern theme management system for Laravel 12.x that helps you organize themes, layouts, assets, and widgets efficiently. This package is based on [teepluss/theme](https://github.com/teepluss/laravel-theme/) but completely rewritten for modern Laravel compatibility.
 
->##### Differences with teepluss version:
->- Compatible with laravel 10.x.
->- Removed twig compatibility (Reduces the package by 94%).
->- Blade directives
->- Better base template.
->- Simplified configuration.
->- More commands and helper functions.
->- Better README file.
->- Manifest file (Get and set theme info)
->- Middleware to define theme and layout
+## ✨ Features
 
-## Usage
+- 🎨 **Multi-Theme Support**: Create and manage multiple themes with ease
+- 🏗️ **Flexible Layouts**: Support for multiple layouts per theme
+- 📦 **Asset Management**: Built-in asset pipeline with dependency management
+- 🧩 **Widget System**: Create reusable widgets for your themes
+- 🍞 **Breadcrumb Management**: Easy breadcrumb generation and customization
+- 🔧 **Artisan Commands**: Powerful CLI tools for theme management
+- 🎯 **Blade Directives**: Custom Blade directives for theme functionality
+- 🚀 **Laravel 12 Ready**: Full compatibility with the latest Laravel version
+- 📱 **Middleware Support**: Route-based theme switching
+- 🎭 **Partial Views**: Modular view system with partials and sections
+- 🔄 **Theme Switching**: Session/cookie-based theme persistence
+- 📤 **Export/Import**: Backup and share themes easily
+- 💾 **Auto-Backup**: Automatic theme backup with rotation
+- 🌐 **CDN Support**: Built-in CDN integration for assets
+- 📊 **Theme Statistics**: Get detailed theme information
+- 👀 **Theme Preview**: Preview themes via URL parameters
+- 🎛️ **Conditional Assets**: Load assets based on conditions
+- 🔒 **Asset Integrity**: SRI support for security
 
-Theme has many features to help you get started with Laravel
+## 🚀 Quick Start
 
-- [Installation](#installation)
-- [Create new theme](#create-new-theme)
-- [Basic usage](#basic-usage)
-- [Configuration](#configuration)
-- [Basic usage of assets](#basic-usage-of-assets)
-- [Partials](#partials)
-- [Magic methods](#magic-methods)
-- [Preparing data to view](#preparing-data-to-view)
-- [Breadcrumb](#breadcrumb)
-- [Widgets](#widgets)
-- [Using theme global](#using-theme-global)
-- [Middleware](#middleware)
-- [Helpers](#helpers)
-- [Cheatsheet](#cheatsheet)
+### Requirements
 
+- PHP 8.2 or higher
+- Laravel 12.x
 
-## Installation
-~~~
+### Installation
+
+1. **Install via Composer:**
+
+```bash
 composer require ayra/laravel-themes
-~~~
-or 
-To get the latest version of laravel-themes simply require it in your `composer.json` file.
+```
 
-~~~json
- "ayra/laravel-themes": "dev-master",
-~~~
+2. **Publish Configuration:**
 
-You'll then need to run `composer install` to download it and have the autoloader updated.
-
-Once Theme is installed you need to register the service provider with the application. Open up `config/app.php` and find the `providers` key.
-
-~~~php
-'providers' => [
-	...
-	Ayra\Theme\ThemeServiceProvider::class,
-
-]
-~~~
-
-Theme also ships with a facade which provides the static syntax for creating collections. You can register the facade in the `aliases` key of your `config/app.php` file.
-
-~~~php
-'aliases' => [
-	...
-	'Theme' => Ayra\Theme\Facades\Theme::class,
-
-]
-~~~
-Publish config using artisan CLI.
-
-~~~
+```bash
 php artisan vendor:publish --provider="Ayra\Theme\ThemeServiceProvider"
-~~~
+```
 
-It's recommended to add to the `.env` file the theme that we are going to use
-~~~
+3. **Add to .env:**
+
+```env
 APP_THEME=default
-~~~
+APP_THEME_LAYOUT=layout
+APP_THEME_DIR=public/themes
+```
 
+4. **Create Your First Theme:**
 
-
-## Create new theme
-
-The first time you have to create theme "default" structure, using the artisan command:
-
-~~~
+```bash
 php artisan theme:create default
-~~~
-> If you change the facade name you can add an option --facade="Alias".
-
-
-This will create the following directory structure:
-
-```
-├── public/
-    └── themes/
-	└── default/
-		├── assets
-        	|	├── css/
-		|	├── img/
-            	|	└── js/
-            	├── layouts/
-            	├── partials/
-           	|	└── sections/
-            	├── views/
-	        └── widgets/
 ```
 
-To delete an existing theme, use the command:
+## 📚 Documentation
 
-~~~
-php artisan theme:destroy default
-~~~
+### Table of Contents
 
-If you want to list all installed themes use the command:
+- [Basic Usage](#basic-usage)
+- [Theme Management](#theme-management)
+- [Asset Management](#asset-management)
+- [Layouts & Views](#layouts--views)
+- [Widgets](#widgets)
+- [Breadcrumbs](#breadcrumbs)
+- [Blade Directives](#blade-directives)
+- [Configuration](#configuration)
+- [Artisan Commands](#artisan-commands)
+- [Advanced Features](#advanced-features)
+- [Theme Switching](#theme-switching)
+- [Export & Import](#export--import)
+- [Asset Optimization](#asset-optimization)
+- [Theme Preview](#theme-preview)
 
-~~~
-php artisan theme:list
-~~~
+## 🎯 Basic Usage
 
-You can duplicate an existing theme:
-~~~
-php artisan theme:duplicate name new-theme
-~~~
+### Setting Up a Theme
 
+```php
+use Ayra\Theme\Facades\Theme;
 
+// Set theme and layout
+Theme::uses('default')->layout('main');
 
-Create from the application without CLI.
+// Render a view
+return Theme::view('home.index', ['title' => 'Welcome']);
+```
 
-~~~php
-Artisan::call('theme:create', ['name' => 'foo']);
-~~~
+### Controller Integration
 
-## Basic usage
-
-To display a view from the controller:
-
-~~~php
+```php
 namespace App\Http\Controllers;
 
-use Theme;
+use Ayra\Theme\Facades\Theme;
 
-class HomeController extends Controller {
-
-	public function getIndex()
-	{
-		return Theme::view('index');
-	}
-	...
-}
-~~~
->This will use the theme and layout set by default on `.env`
-
-		
-You can add data or define the theme and layout:
-
-~~~php
-...		
-Theme::uses('themename');
-        
-$data['info'] = 'Hello World'; 
-
-return Theme::view('index', $data);
-...
-~~~
-
-Or you can do:
-~~~php
-$cookie = Cookie::make('name', 'Tee');
-
-return Theme::view([
-		    'view' => 'index',
-		    'theme' => 'default',
-		    'layout' => 'layout',
-		    'statusCode' => 200,
-		    'cookie'  => $cookie,
-		    'args' => $data
-		   ]);
-~~~
->All values except `'view'` are optional
-
-To check whether a theme exists.
-
-~~~php
-Theme::exists('themename');
-~~~
-
-Each theme must come supplied with a manifest file `theme.json` stored at the root of the theme, which defines supplemental details about the theme. 
-~~~json
+class HomeController extends Controller
 {
-    "slug": "default",
-    "name": "Default",
-    "author": "John Doe",
-    "email": "johndoe@example.com",
-    "description": "This is an example theme.",
-    "web": "www.example.com",
-    "license": "MIT",
-    "version": "1.0"
+    public function index()
+    {
+        Theme::uses('default')->layout('main');
+        
+        return Theme::view('home.index', [
+            'title' => 'Welcome to Our Site',
+            'description' => 'A beautiful theme-powered website'
+        ]);
+    }
 }
-~~~
+```
 
-The manifest file can store any property that you'd like. These values can be retrieved and even set through a couple helper methods:
+## 🎨 Theme Management
 
-~~~php
-// Get all: (array)
-Theme::info(); 
-// Get:
-Theme::info("property"); 
-// Set:
-Theme::info("property", "new data"); 
-~~~
+### Creating Themes
 
-#### Other ways to display a view:
-~~~php
-$theme = Theme::uses('default')->layout('mobile');
+```bash
+# Create a new theme
+php artisan theme:create my-theme
 
-$data = ['info' => 'Hello World'];
-~~~
+# Create theme with custom facade
+php artisan theme:create my-theme --facade="MyTheme"
 
-~~~php
-// It will look up the path 'resources/views/home/index.php':
-return $theme->of('home.index', $data)->render();
-~~~
+# Duplicate existing theme
+php artisan theme:duplicate default new-theme
 
-~~~php
-// Specific status code with render:
-return $theme->of('home.index', $data)->render(200);
-~~~
+# List all themes
+php artisan theme:list
 
-~~~php
-// It will look up the path 'resources/views/mobile/home/index.php':
-return $theme->ofWithLayout('home.index', $data)->render();
-~~~
+# Remove a theme
+php artisan theme:destroy my-theme
+```
 
-~~~php
-// It will look up the path 'public/themes/default/views/home/index.php':
-return $theme->scope('home.index', $data)->render();
-~~~
+### Theme Structure
 
-~~~php
-// It will look up the path 'public/themes/default/views/mobile/home/index.php':
-return $theme->scopeWithLayout('home.index', $data)->render();
-~~~
+```
+public/themes/my-theme/
+├── assets/
+│   ├── css/
+│   ├── js/
+│   └── img/
+├── layouts/
+├── partials/
+│   └── sections/
+├── views/
+├── widgets/
+├── theme.json
+└── config.php
+```
 
-~~~php
-// Looking for a custom path:
-return $theme->load('app.somewhere.viewfile', $data)->render();
-~~~
+### Theme Manifest (theme.json)
 
-~~~php
-// Working with cookie:
-$cookie = Cookie::make('name', 'Tee');
-return $theme->of('home.index', $data)->withCookie($cookie)->render();
-~~~
+```json
+{
+    "slug": "my-theme",
+    "name": "My Beautiful Theme",
+    "author": "Your Name",
+    "email": "your@email.com",
+    "description": "A stunning theme for Laravel applications",
+    "web": "https://yoursite.com",
+    "license": "MIT",
+    "version": "1.0.0"
+}
+```
 
-~~~php
-// Get only content:
-return $theme->of('home.index')->content();
-~~~
+## 🔄 Theme Switching
 
-Finding from both theme's view and application's view:
-~~~php
-$theme = Theme::uses('default')->layout('default');
+### Session/Cookie Based Switching
 
-return $theme->watch('home.index')->render();
-~~~
+```php
+// Switch theme and persist in session/cookie
+Theme::switch('dark-theme', true);
 
-To find the location of a view:
+// Switch theme for current request only
+Theme::switch('light-theme', false);
 
-~~~php
-$which = $theme->scope('home.index')->location();
+// Get current theme from session/cookie
+$currentTheme = Theme::getCurrentTheme();
 
-echo $which; // theme::views.home.index
+// Check if specific theme is active
+if (Theme::isActive('dark-theme')) {
+    // Dark theme specific logic
+}
 
-$which = $theme->scope('home.index')->location(true);
+// Clear theme session/cookie
+Theme::clearTheme();
+```
 
-echo $which; // ./public/themes/name/views/home/index.blade.php
-~~~
+### Theme Preview via URL
 
-#### Render from string:
+```php
+// Preview theme: /home?theme=dark-theme
+// Preview layout: /home?layout=mobile
 
-~~~php
-return $theme->string('<h1>{{ $name }}</h1>', ['name' => 'Teepluss'], 'blade')->render();
-~~~
+// Add middleware to routes
+Route::get('/home', function () {
+    return Theme::view('home.index');
+})->middleware('theme.preview');
+```
 
-Compile string:
+### Route-Based Theme Switching
 
-~~~php
-$template = `<h1>Name: {{ $name }}</h1>
-		     <p>
-		      {{ Theme::widget("WidgetIntro", ["title" => "Demo Widget"])->render() }}
-		     </p>`;
+```php
+// Apply theme middleware to routes
+Route::get('/admin', function () {
+    return Theme::view('admin.dashboard');
+})->middleware('theme:admin,admin-layout');
 
-echo Theme::blader($template, ['name' => 'Teepluss']);
-~~~
+// Route groups with theme
+Route::group(['middleware' => 'theme:mobile,mobile-layout'], function () {
+    Route::get('/mobile', function () {
+        return Theme::view('mobile.home');
+    });
+});
+```
 
-#### Symlink from another view
+## 📤 Export & Import
 
-This is a nice feature when you have multiple files that have the same name, but need to be located as a separate one.
+### Export Themes
 
-~~~php
-// Theme A : /public/themes/a/views/welcome.blade.php
-// Theme B : /public/themes/b/views/welcome.blade.php
+```bash
+# Export theme to ZIP
+php artisan theme:export default
 
-// File welcome.blade.php at Theme B is the same as Theme A, so you can do link below:
+# Export with custom output path
+php artisan theme:export default --output=/path/to/backup.zip
+```
 
-Theme::symlink('a'); 
-// Location: public/themes/b/views/welcome.blade.php
-~~~
+### Import Themes
 
-## Configuration
+```bash
+# Import theme from ZIP
+php artisan theme:import /path/to/theme.zip
 
-After the config is published, you will see a global config file `/config/theme.php`, all the configuration can be replaced by a config file inside a theme: `/public/themes/[theme]/config.php`
+# Import with custom name
+php artisan theme:import /path/to/theme.zip --name="my-custom-theme"
 
-The config is convenient for setting up basic CSS/JS, partial composer, breadcrumb template and also metas.
+# Force import (overwrite existing)
+php artisan theme:import /path/to/theme.zip --force
+```
 
-~~~php
-'events' => [
+### Auto-Backup System
 
-	/* 
-	 * Before event inherit from package config and the theme that call
-	 * before, you can use this event to set meta, breadcrumb
-	 * template or anything you want inheriting.
-	 */
-	'before' => function($theme)
-	{
-		// You can remove this lines anytime.
-		$theme->setTitle('Title Example');
-		$theme->setAuthor('John Doe');
-		$theme->setKeywords('Example, Web');
-	
-		// Breadcrumb template.
-		$theme->breadcrumb()->setTemplate(`        
-			 <ul class="breadcrumb">
-			 @foreach($crumbs as $i => $crumb)
-				 @if($i != (count($crumbs) - 1))
-					<li>
-                    	<a href="{{ $crumb["url"] }}">{{ $crumb["label"] }}</a>
-                        <span class="divider">/</span>
-					</li>
-				 @else
-					<li class="active">{{ $crumb["label"] }}</li>
-				 @endif
-			 @endforeach
-			 </ul>             
-		 `);
-	 },
-    
-    /*
-	 * Listen on event before render a theme, this
-	 * event should call to assign some assets.
-	 */
-	'asset' => function($asset)
-	{
-		$asset->themePath()->add([
-					['style', 'css/style.css'],
-					['script', 'js/script.js']
-					 ]);
+```bash
+# Create backup with automatic rotation
+php artisan theme:backup default
 
-		// You may use elixir to concat styles and scripts.
-		$asset->themePath()->add([
-					['styles', 'dist/css/styles.css'],
-					['scripts', 'dist/js/scripts.js']
-					 ]);
+# Keep specific number of backups
+php artisan theme:backup default --keep=10
+```
 
-		// Or you may use this event to set up your assets.
-		$asset->themePath()->add('core', 'core.js');			
-		$asset->add([
-			['jquery', 'vendor/jquery/jquery.min.js'],
-			['jquery-ui', 'vendor/jqueryui/jquery-ui.min.js', ['jquery']]
-			 ]);
-	},
-   
+## 📦 Asset Management
 
-	/*
-	 * Listen on event before render a theme, this event should
-	 * call to assign some partials or breadcrumb template.
-	 */
-	'beforeRenderTheme' => function($theme)
-	{
-		$theme->partialComposer('header', function($view){
-			$view->with('auth', Auth::user());
-		});
-	},
+### Basic Asset Management
 
-	/*
-	 * Listen on event before render a layout, this should 
-	 * call to assign style, script for a layout.
-	 */
-	'beforeRenderLayout' => [
-		'mobile' => function($theme){
-			$theme->asset()->usePath()->add('ipad', 'css/layouts/ipad.css');
-		}
-	]
-];
-~~~
+```php
+// In your theme config.php or controller
+$asset = Theme::asset();
 
-## Basic usage of assets
+// Add CSS and JS files
+$asset->add('bootstrap', 'css/bootstrap.min.css');
+$asset->add('jquery', 'js/jquery.min.js', ['bootstrap']);
 
-You can add assets on the `asset` method of the config file. If yo want to add assets in your route you can get `$asset` variable from `$theme->asset()`.
+// Theme-specific assets
+$asset->themePath()->add('custom', 'css/custom.css');
 
-~~~php
-$asset->add('core-style', 'css/style.css');
-// path: public/css/style.css
+// External CDN assets
+$asset->add('fontawesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css');
+```
 
-$asset->container('footer')->add('core-script', 'js/script.js');
-// path: public/js/script.css
+### Advanced Asset Features
 
-$asset->themePath()->add('custom', 'css/custom.css', ['core-style']);
-// path: public/themes/[current-theme]/assets/css/custom.css
-// This case has dependency with "core-style".
+```php
+// CDN Support
+$asset->enableCdn('https://cdn.example.com');
+$asset->add('bootstrap', 'css/bootstrap.min.css');
+$asset->disableCdn();
 
-$asset->container('footer')->themePath()->add('custom', 'js/custom.js', array('core-script'));
-// path: public/themes/[current theme]/assets/js/custom.js
-// This case has dependency with "core-script".
-~~~
-> You can force use theme to look up existing theme by passing parameter to method: `$asset->themePath('default')`
+// Asset Versioning
+$asset->addVersioned('app', 'js/app.js');
+$asset->addVersioned('style', 'css/style.css', [], '2.0.0');
 
-Writing in-line style or script:
+// Conditional Assets
+$asset->addConditional('mobile', 'mobile-css', 'css/mobile.css');
+$asset->addConditional('desktop', 'desktop-css', 'css/desktop.css');
 
-~~~php
-// Dependency with.
-$dependencies = [];
+// Asset Integrity (SRI)
+$asset->addWithIntegrity('bootstrap', 'css/bootstrap.min.css', 'sha384-...');
 
-// Writing an in-line script.
-$asset->writeScript('inline-script', '
-	$(function() {
-		console.log("Running");
-	})', $dependencies);
+// Asset Optimization
+$asset->optimize(true); // Use minified versions in production
+```
 
-// Writing an in-line style.
-$asset->writeStyle('inline-style', 'h1{ font-size: 0.9em; }', $dependencies);
+### Asset Containers
 
-// Writing an in-line script, style without tag wrapper.
-$asset->writeContent('custom-inline-script', '
-	<script>
-		$(function() {
-			console.log("Running");
-		});
-	</script>', $dependencies);
-~~~
+```php
+// Create named containers
+$asset->container('footer')->add('footer-script', 'js/footer.js');
 
-Render styles and scripts in your blade layout:
+// Render specific containers
+@scripts('footer')
+```
 
-~~~php
-// Without container
+### Inline Assets
+
+```php
+// Inline CSS
+$asset->writeStyle('custom-style', 'body { background: #f0f0f0; }');
+
+// Inline JavaScript
+$asset->writeScript('custom-script', 'console.log("Hello World!");');
+```
+
+## 🏗️ Layouts & Views
+
+### Layout System
+
+```php
+// Set layout
+Theme::layout('admin');
+
+// Multiple layouts
+Theme::layout('mobile')->uses('mobile-theme');
+```
+
+### View Rendering
+
+```php
+// Basic view
+Theme::view('home.index', $data);
+
+// With specific theme and layout
+Theme::uses('admin')->layout('dashboard')->view('admin.dashboard', $data);
+
+// Scope to theme directory
+Theme::scope('home.index', $data)->render();
+
+// Watch both theme and app views
+Theme::watch('home.index', $data)->render();
+```
+
+### Partials
+
+```php
+// Render partial
+@partial('header', ['title' => 'Page Header'])
+
+// Sections (from partials/sections/)
+@sections('main')
+
+// Partial with layout context
+Theme::partialWithLayout('sidebar', ['menu' => $menu]);
+```
+
+## 🧩 Widgets
+
+### Creating Widgets
+
+```bash
+# Global widget
+php artisan theme:widget UserProfile --global
+
+# Theme-specific widget
+php artisan theme:widget UserProfile default
+```
+
+### Widget Class
+
+```php
+namespace App\Widgets;
+
+use Ayra\Theme\Widget;
+
+class WidgetUserProfile extends Widget
+{
+    public function render($data = [])
+    {
+        return view('widgets.user-profile', $data);
+    }
+}
+```
+
+### Using Widgets
+
+```php
+// In Blade templates
+@widget('user-profile', ['user' => $user])
+
+// In PHP
+Theme::widget('user-profile', ['user' => $user])->render();
+```
+
+## 🍞 Breadcrumbs
+
+### Creating Breadcrumbs
+
+```php
+// Simple breadcrumb
+Theme::breadcrumb()
+    ->add('Home', '/')
+    ->add('Products', '/products')
+    ->add('Category', '/products/category');
+
+// Array-based
+Theme::breadcrumb()->add([
+    ['label' => 'Home', 'url' => '/'],
+    ['label' => 'Products', 'url' => '/products'],
+    ['label' => 'Category', 'url' => '/products/category']
+]);
+```
+
+### Custom Templates
+
+```php
+// Set custom template
+Theme::breadcrumb()->setTemplate('
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            @foreach($crumbs as $i => $crumb)
+                @if($i != (count($crumbs) - 1))
+                    <li class="breadcrumb-item">
+                        <a href="{{ $crumb["url"] }}">{{ $crumb["label"] }}</a>
+                    </li>
+                @else
+                    <li class="breadcrumb-item active">{{ $crumb["label"] }}</li>
+                @endif
+            @endforeach
+        </ol>
+    </nav>
+');
+
+// Render breadcrumbs
+{!! Theme::breadcrumb()->render() !!}
+```
+
+## 🎭 Blade Directives
+
+### Available Directives
+
+```php
+// Theme data
+@get('title')
+@getIfHas('description', 'Default description')
+
+// Partials and sections
+@partial('header', ['title' => 'Header'])
+@sections('main')
+
+// Content
+@content()
+
+// Assets
 @styles()
-
-// With "footer" container
+@scripts()
+@styles('footer')
 @scripts('footer')
 
-// Get a specific path from the asset folder
-@asset('img/image.png')
-~~~
-> Scripts and Style can be used with or without container
+// Widgets
+@widget('user-profile', ['user' => $user])
 
-or a more complex way:
-
-~~~php
-{!! Theme::asset()->styles() !!}
-
-{!! Theme::asset()->container('footer')->scripts() !!}
-~~~
-
-Direct path to theme asset:
-
-~~~php
-{!! Theme::asset()->url('img/image.png') !!}
-~~~
-
-#### Preparing group of assets:
-
-Some assets you don't want to add on a page right now, but you still need them sometimes, so `cook` and `serve` is your magic.
-
-Cook your assets.
-~~~php
-Theme::asset()->cook('backbone', function($asset)
-{
-	$asset->add('backbone', '//cdnjs.cloudflare.com/ajax/libs/backbone.js/1.0.0/backbone-min.js');
-	$asset->add('underscorejs', '//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.4/underscore-min.js');
-});
-~~~
-
-You can prepare on a global in package config:
-
-~~~php
-// Location: config/theme/config.php
-....
-	'events' => array(
-		....
-		// This event will fire as a global you can add any assets you want here.
-		'asset' => function($asset)
-		{
-			// Preparing asset you need to serve after.
-			$asset->cook('backbone', function($asset)
-			{
-				$asset->add('backbone', '//cdnjs.cloudflare.com/ajax/libs/backbone.js/1.0.0/backbone-min.js');
-				$asset->add('underscorejs', '//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.4/underscore-min.js');
-			});
-		}
-	)
-....
-~~~
-
-Serve theme when you need:
-~~~php
-// At the controller.
-Theme::asset()->serve('backbone');
-~~~
-
-Then you can get output:
-~~~php
-<html>
-  <head>
-      @styles()
-      @styles('your-container')
-  </head>
-  <body>
-      ...
-      @scripts()
-      @scripts('your-container')
-  </body>
-<html>
-~~~
-
-## Partials
-
-Render a partial in your layouts or views:
-~~~php
-@partial('header', ['title' => 'Header']);
-~~~
-
-> This will look up to `/public/themes/[theme]/partials/header.php`, and will add a variable `$title` (optional)
-
-Partial with current layout specific:
-~~~php
-Theme::partialWithLayout('header', ['title' => 'Header']);
-~~~
-> This will look up up to `/public/themes/[theme]/partials/[CURRENT_LAYOUT]/header.php`
-
-Finding from both theme's partial and application's partials:
-
-~~~php
-Theme::watchPartial('header', ['title' => 'Header']);
-~~~
-
-##### Partial composer:
-
-~~~php
-$theme->partialComposer('header', function($view)
-{
-	$view->with('key', 'value');
-});
-
-// Working with partialWithLayout.
-$theme->partialComposer('header', function($view)
-{
-	$view->with('key', 'value');
-}, 'layout-name');
-~~~
-
-### Sections
-
-The `@sections` blade directive simplify the access to `/partials/sections/` path:
-~~~php
-@sections('main')
-~~~
-
-It's the same as:
-~~~php
-@partial('sections.main')
-~~~
-
-
-## Magic methods
-
-Magic methods allow you to set, prepend and append anything.
-
-~~~php
-$theme->setTitle('Your title');
-
-$theme->appendTitle('Your appended title');
-
-$theme->prependTitle('Hello: ....');
-
-$theme->setAnything('anything');
-
-$theme->setFoo('foo');
-
-$theme->set('foo', 'foo');
-~~~
-
-Render in your blade layout or view:
-
-~~~php
-@get('foo')
-
-@get('foo', 'Default msj')
-
-Theme::getAnything();
-
-Theme::getFoo();
-
-Theme::get('foo', 'Default msj');
-~~~
-
-##### Check if the place exists or not:
-~~~php
-@getIfHas('title')
-~~~
-It's the same as:
-~~~php
-@if(Theme::has('title'))
-	{{ Theme::get('title') }}
-@endif
-~~~
-~~~php
-@if(Theme::hasTitle())
-	{{ Theme::getTitle() }}
-@endif
-~~~
-
-Get argument assigned to content in layout or region:
-
-~~~php
-Theme::getContentArguments();
-Theme::getContentArgument('name');
-~~~
-To check if it exists:
-~~~php
-Theme::hasContentArgument('name');
-~~~
-
-> Theme::place('content') is a reserve region to render sub-view.
-
-## Preparing data to view
-
-Sometimes you don't need to execute heavy processing, so you can prepare and use when you need it.
-
-~~~php
-$theme->bind('something', function()
-{
-	return 'This is bound parameter.';
-});
-~~~
-
-Using bound data on view:
-
-~~~php
-echo Theme::bind('something');
-~~~
-
-## Breadcrumb
-
-In order to use breadcrumbs, follow the instruction below:
-
-~~~php
-$theme->breadcrumb()->add('label', 'http://...')->add('label2', 'http:...');
-
-// or
-
-$theme->breadcrumb()->add([[
-			 'label' => 'label1',
-			 'url'   => 'http://...'
-			],[
-			 'label' => 'label2',
-			 'url'   => 'http://...'
-			]]);
-~~~
-
-To render breadcrumbs:
-~~~php
-{!! $theme->breadcrumb()->render() !!}
-~~~
-or
-~~~php
-{!! Theme::breadcrumb()->render() !!}
-~~~
-
-You can set up breadcrumbs template anywhere you want by using a blade template.
-
-~~~php
-$theme->breadcrumb()->setTemplate('
-	<ul class="breadcrumb">
-	  @foreach ($crumbs as $i => $crumb)
-		  @if ($i != (count($crumbs) - 1))
-			  <li><a href="{{ $crumb["url"] }}">{{ $crumb["label"] }}</a><span class="divider">/</span></li>
-		  @else
-			  <li class="active">{{ $crumb["label"] }}</li>
-		  @endif
-	  @endforeach
-	</ul>
-');
-~~~
-
-## Widgets
-
-Theme has many useful features called "widget" that can be anything.
-You can create a global widget class using artisan command:
-
-~~~bash
-php artisan theme:widget demo --global
-~~~
-> Widget tpl is located in "resources/views/widgets/{widget-tpl}.blade.php"
-
-Creating a specific theme name.
-~~~
-php artisan theme:widget demo default 
-~~~
-> Widget tpl is located in "public/themes/[theme]/widgets/{widget-tpl}.blade.php"
-
-Now you will see a widget class at /app/Widgets/WidgetDemo.php
-
-~~~html
-<h1>User Id: {{ $label }}</h1>
-~~~
-
-##### Calling your widget in layout or view:
-
-~~~php
-@widget('demo', ['label' => 'Hi!'])
-~~~
-
-or
-
-~~~php
-{!! Theme::widget('demo', ['label' => 'Hi!'])->render() !!}
-~~~
-
-## Using theme global
-~~~php
-use Ayra\Theme\Contracts\Theme;
-use App\Http\Controllers\Controller;
-
-class BaseController extends Controller {
-
-	/**
-	 * Theme instance.
-	 *
-	 * @var \Ayra\Theme\Theme
-	 */
-	protected $theme;
-
-	/**
-	 * Construct
-	 *
-	 * @return void
-	 */
-	public function __construct(Theme $theme)
-	{
-		// Using theme as a global.
-		$this->theme = $theme->uses('default')->layout('ipad');
-	}
-
-}
-~~~
-
-To override theme or layout.
-~~~php
-public function getIndex()
-{
-	$this->theme->uses('newone');
-
-	// or just override layout
-	$this->theme->layout('desktop');
-
-	$this->theme->of('somewhere.index')->render();
-}
-~~~
-## Middleware:
-
-A middleware is included out of the box if you want to define a theme or layout per route. For Laravel 5.4+ the middleware is installed by default.
-
-##### To install it in Laravel before 5.4:
-
-Only register it in `app\Http\Kernel.php`
-~~~php
-protected $routeMiddleware = [
-    ...
-    'setTheme' => \Ayra\Theme\Middleware\ThemeLoader::class,
-];
-~~~
-
-##### Usage:
-You can apply the middleware to a route or route-group with the string `'theme:[theme],[layout]'`
-~~~php
-Route::get('/', function () {
-	...
-	return Theme::view('index');
-})->middleware('theme:default,layout');
-~~~
-
-Or using groups:
-
-~~~php
-Route::group(['middleware'=>'theme:default,layout'], function() {
-    ...
-});
-~~~
-
-## Helpers
-##### Protect emails:
-Protect the email address against bots or spiders that index or harvest addresses for sending you spam.
-~~~php
-{!! protectEmail('email@example.com') !!}
-~~~
-or shorter
-~~~php
+// Utilities
 @protect('email@example.com')
-~~~
-##### Metadata init:
-Print meta tags with common metadata.
-~~~php
-{!! meta_init() !!}
-~~~
-> Returns: `<meta charset="utf-8"> <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"> <meta name="viewport" content="width=device-width, initial-scale=1">`
-  
-## Cheatsheet
-##### Commands:
-Command | Description 
------------- | -------------
-`artisan theme:create name` | Generate theme structure.
-`artisan theme:destroy name` | Remove a theme.
-`artisan theme:list` | Show a list of all themes.
-`artisan theme:duplicate name new` | Duplicate theme structure from other theme.
-`artisan theme:widget demo default` | Generate widget structure.
+@dd('Debug info')
+@d('Debug info')
+@dv()
+```
 
-##### Blade Directives:
-Blade | Description 
------------- | -------------
-`@get('value')` |  Magic method for get. 
-`@getIfHas('value')` | Like `@get` but show only if exist.
-`@partial('value', ['var'=> 'optional'])` | Load the partial from current theme.
-`@section('value', ['var'=> 'optional'])` | Like `@partial` but load from sections folder.
-`@content()` | Load the content of the selected view.
-`@styles('optional')` | Render styles declared in theme config.
-`@scripts('optional')` | Render scripts declared in theme config.
-`@widget('value', ['var'=> 'optional'])` | Render widget.
-`@protect('value')` | Protect the email address against bots or spiders.
-`@dd('value')` | Dump and Die. 
-`@d('value')` | Only dump.
-`@dv()` | Dump, Die and show all defined variables.
+## 🛠️ Helper Functions
 
-##### Helpers:
-Helper | Description 
------------- | -------------
-`protectEmail('email')` | Protect the email address against bots or spiders.
-`meta_init()` | Print meta tags with common metadata.
+### Date & Time Helpers
+
+```php
+// Format dates
+format_date('2024-01-15', 'F j, Y') // January 15, 2024
+human_date('2024-01-15') // 2 months ago
+time_ago('2024-01-15') // 2 months ago
+
+// Date checks
+is_weekend('2024-01-15') // false
+is_business_day('2024-01-15') // true
+
+// Age calculation
+get_age('1990-05-20') // 33
+```
+
+### Formatting Helpers
+
+```php
+// Number formatting
+format_bytes(1024) // 1 KB
+format_number(1500) // 1.5K
+format_currency(99.99, 'USD') // $99.99
+
+// Text formatting
+slugify('Hello World!') // hello-world
+truncate('Long text here...', 10) // Long text...
+word_limit('Many words in this sentence', 5) // Many words in this...
+
+// Search highlighting
+highlight_search('Hello World', 'world') // Hello <mark>World</mark>
+```
+
+### Security & Privacy Helpers
+
+```php
+// Password & token generation
+generate_password(16, true) // Random secure password
+generate_token(32) // Random hex token
+
+// Data masking
+mask_email('user@example.com') // us**@ex***.com
+mask_phone('+1-555-123-4567') // +1-5**-***-4567
+
+// Email protection
+protectEmail('user@example.com') // JavaScript-protected email link
+```
+
+### Device & Browser Detection
+
+```php
+// Device type
+is_mobile() // true/false
+is_tablet() // true/false
+is_desktop() // true/false
+
+// Browser information
+$browser = get_browser_info();
+// Returns: ['browser' => 'Chrome', 'version' => '120.0', 'os' => 'Windows']
+
+// Client information
+get_client_ip() // Client IP address
+get_country_code() // Country code from IP
+```
+
+### File & Media Helpers
+
+```php
+// File validation
+is_image('photo.jpg') // true
+is_video('movie.mp4') // true
+is_audio('song.mp3') // true
+
+// File utilities
+sanitize_filename('My File (1).pdf') // My_File_1.pdf
+get_file_extension('document.pdf') // pdf
+get_file_size('/path/to/file') // 2.5 MB
+```
+
+### Validation Helpers
+
+```php
+// Input validation
+validate_email('user@example.com') // true
+validate_url('https://example.com') // true
+validate_ip('192.168.1.1') // true
+```
+
+### UI & Design Helpers
+
+```php
+// Colors
+get_random_color() // #a1b2c3
+get_contrast_color('#ffffff') // #000000
+
+// Emojis
+get_emoji('smile') // 😊
+get_emoji('heart') // ❤️
+get_flag_emoji('US') // 🇺🇸
+
+// Gravatar
+get_gravatar_url('user@example.com', 200) // Gravatar URL
+```
+
+### Testing & Development Helpers
+
+```php
+// Random test data
+get_random_name() // John Smith
+get_random_email() // john.smith@gmail.com
+get_random_company() // TechCorp
+get_random_phone() // +1-555-123-4567
+get_random_address() // 123 Main St, New York, NY 10001
+get_random_website() // https://www.example.com
+
+// Random quotes
+get_random_quote() // Inspirational quote
+```
+
+### SEO & Meta Helpers
+
+```php
+// Basic meta tags
+meta_init() // Common meta tags
+
+// Custom meta tags
+meta_tags([
+    'title' => 'Page Title',
+    'description' => 'Page description',
+    'keywords' => 'laravel, themes'
+])
+
+// SEO tags
+seo_tags(
+    'Page Title',
+    'Page description',
+    'keywords',
+    'Author Name',
+    'https://example.com/image.jpg',
+    'https://example.com/page'
+)
+```
+
+### Utility Helpers
+
+```php
+// Ordinal numbers
+get_ordinal(1) // 1st
+get_ordinal(2) // 2nd
+get_ordinal(3) // 3rd
+
+// Pluralization
+get_plural('category', 1) // category
+get_plural('category', 5) // categories
+
+// QR Code & Barcode (requires additional libraries)
+generate_qr_code('https://example.com')
+generate_barcode('123456789')
+```
+
+## 🚀 Advanced Features
+
+### Theme Statistics
+
+```php
+// Get all available themes
+$themes = Theme::getAvailableThemes();
+
+// Get theme statistics
+$stats = Theme::getThemeStats('default');
+// Returns: ['views' => 15, 'partials' => 8, 'assets' => 12, 'layouts' => 3, 'widgets' => 5]
+
+// Check theme existence
+if (Theme::exists('my-theme')) {
+    // Theme exists
+}
+```
+
+### Theme Preview URLs
+
+```php
+// Generate preview URLs
+$previewUrl = Theme::getPreviewUrl('dark-theme', '/home');
+// Returns: http://yoursite.com/home?theme=dark-theme
+
+$layoutPreviewUrl = Theme::getPreviewUrl('default', '/admin', 'admin-layout');
+// Returns: http://yoursite.com/admin?theme=default&layout=admin-layout
+```
+
+### Conditional Asset Loading
+
+```php
+// Load assets based on conditions
+$asset->addConditional('mobile', 'mobile-css', 'css/mobile.css');
+$asset->addConditional('desktop', 'desktop-css', 'css/desktop.css');
+
+// In your Blade templates
+@if(request()->isMobile())
+    @foreach(Theme::asset()->getConditionalAssets('mobile') as $name => $asset)
+        <link rel="stylesheet" href="{{ $asset['path'] }}">
+    @endforeach
+@endif
+```
+
+### Asset Optimization
+
+```php
+// Enable optimization for production
+if (app()->environment('production')) {
+    Theme::asset()->optimize(true);
+}
+
+// This will automatically use minified versions if they exist
+// css/style.css → css/min/style.min.css
+```
+
+### Theme Switching Examples
+
+```php
+// Switch theme with persistence
+Theme::switch('dark-theme', true);
+
+// Switch theme for current request only
+Theme::switch('light-theme', false);
+
+// Check current theme
+$currentTheme = Theme::getCurrentTheme();
+
+// Check if specific theme is active
+if (Theme::isActive('dark-theme')) {
+    // Dark theme specific logic
+}
+```
+
+### Export/Import Examples
+
+```bash
+# Export theme
+php artisan theme:export default --output=/backups/theme.zip
+
+# Import theme
+php artisan theme:import /backups/theme.zip --name="restored-theme" --force
+
+# Create backup with rotation
+php artisan theme:backup default --keep=10
+```
+
+### Advanced Asset Management
+
+```php
+// CDN Support
+$asset->enableCdn('https://cdn.example.com');
+$asset->add('bootstrap', 'css/bootstrap.min.css');
+
+// Asset Versioning
+$asset->addVersioned('app', 'js/app.js');
+$asset->addVersioned('style', 'css/style.css', [], '2.0.0');
+
+// Asset Integrity (SRI)
+$asset->addWithIntegrity('bootstrap', 'css/bootstrap.min.css', 'sha384-...');
+
+// Conditional Assets
+$asset->addConditional('mobile', 'mobile-css', 'css/mobile.css');
+$asset->addConditional('desktop', 'desktop-css', 'css/desktop.css');
+```
+
+## 📚 Complete Helper Function Reference
+
+### Date & Time Functions
+- `format_date($date, $format, $timezone)` - Format date with custom format
+- `human_date($date)` - Get human readable date
+- `time_ago($timestamp)` - Get time ago from timestamp
+- `is_weekend($date)` - Check if date is weekend
+- `is_business_day($date)` - Check if date is business day
+- `get_age($birthDate)` - Calculate age from birth date
+
+### Formatting Functions
+- `format_bytes($bytes, $precision)` - Format bytes to human readable
+- `format_number($number, $precision)` - Format number with abbreviations
+- `format_currency($amount, $currency, $locale)` - Format currency
+- `slugify($text, $separator)` - Create URL-friendly slug
+- `truncate($text, $length, $ending)` - Truncate text to length
+- `word_limit($text, $limit, $ending)` - Limit text to word count
+- `highlight_search($text, $search, $highlight)` - Highlight search terms
+
+### Security Functions
+- `generate_password($length, $special_chars)` - Generate random password
+- `generate_token($length)` - Generate random token
+- `mask_email($email, $mask)` - Mask email for privacy
+- `mask_phone($phone, $mask)` - Mask phone for privacy
+- `protectEmail($email)` - Protect email from bots
+
+### Device Detection Functions
+- `is_mobile()` - Check if request is from mobile
+- `is_tablet()` - Check if request is from tablet
+- `is_desktop()` - Check if request is from desktop
+- `get_browser_info()` - Get browser information
+- `get_client_ip()` - Get client IP address
+- `get_country_code($ip)` - Get country code from IP
+
+### File Functions
+- `sanitize_filename($filename)` - Sanitize filename
+- `get_file_extension($filename)` - Get file extension
+- `is_image($filename)` - Check if file is image
+- `is_video($filename)` - Check if file is video
+- `is_audio($filename)` - Check if file is audio
+- `get_file_size($filepath)` - Get file size
+
+### Validation Functions
+- `validate_email($email)` - Validate email address
+- `validate_url($url)` - Validate URL
+- `validate_ip($ip)` - Validate IP address
+
+### UI Functions
+- `get_random_color()` - Get random color
+- `get_contrast_color($hexColor)` - Get contrasting color
+- `get_emoji($name)` - Get emoji by name
+- `get_flag_emoji($countryCode)` - Get country flag emoji
+- `get_gravatar_url($email, $size)` - Get Gravatar URL
+
+### Utility Functions
+- `get_ordinal($number)` - Get ordinal suffix
+- `get_plural($singular, $count)` - Get plural form
+- `get_random_quote()` - Get random inspirational quote
+- `get_random_name()` - Get random name for testing
+- `get_random_email()` - Get random email for testing
+- `get_random_company()` - Get random company for testing
+
+### SEO Functions
+- `meta_init()` - Print common meta tags
+- `meta_tags($tags)` - Generate meta tags from array
+- `seo_tags($title, $description, $keywords, $author, $image, $url)` - Generate SEO meta tags
+
+## 🎯 Usage Examples in Themes
+
+### In Theme Configuration
+
+```php
+// public/themes/my-theme/config.php
+return [
+    'events' => [
+        'before' => function($theme) {
+            // Set dynamic title with current date
+            $theme->setTitle('My Theme - ' . format_date(now(), 'F Y'));
+            
+            // Set meta tags
+            $theme->setDescription('A beautiful theme created on ' . human_date(now()));
+            
+            // Add conditional assets based on device
+            if (is_mobile()) {
+                $theme->asset()->add('mobile-css', 'css/mobile.css');
+            }
+        },
+        'asset' => function($asset) {
+            // Add versioned assets
+            $asset->addVersioned('main', 'css/main.css');
+            $asset->addVersioned('app', 'js/app.js');
+            
+            // Add CDN assets
+            $asset->enableCdn('https://cdn.example.com');
+            $asset->add('bootstrap', 'css/bootstrap.min.css');
+            $asset->disableCdn();
+        }
+    ]
+];
+```
+
+### In Blade Templates
+
+```php
+{{-- layouts/main.blade.php --}}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {!! meta_init() !!}
+    {!! seo_tags($title ?? 'My Site', $description ?? 'Welcome', $keywords ?? '') !!}
+    
+    @styles()
+    
+    {{-- Conditional assets --}}
+    @if(is_mobile())
+        <link rel="stylesheet" href="{{ asset('css/mobile.css') }}">
+    @endif
+</head>
+<body>
+    <header>
+        <h1>{{ $title ?? 'Welcome' }}</h1>
+        <p>Last updated: {{ human_date($lastUpdated) }}</p>
+        
+        {{-- Device-specific content --}}
+        @if(is_mobile())
+            <div class="mobile-nav">Mobile Navigation</div>
+        @elseif(is_tablet())
+            <div class="tablet-nav">Tablet Navigation</div>
+        @else
+            <div class="desktop-nav">Desktop Navigation</div>
+        @endif
+    </header>
+    
+    <main>
+        @content()
+    </main>
+    
+    <footer>
+        <p>&copy; {{ date('Y') }} {{ get_random_company() }}</p>
+        <p>Generated in {{ format_bytes(memory_get_peak_usage()) }}</p>
+    </footer>
+    
+    @scripts()
+</body>
+</html>
+```
+
+### In Controllers
+
+```php
+namespace App\Http\Controllers;
+
+use Ayra\Theme\Facades\Theme;
+
+class HomeController extends Controller
+{
+    public function index()
+    {
+        // Switch theme based on user preference
+        if (request()->has('theme')) {
+            Theme::switch(request()->get('theme'), true);
+        }
+        
+        // Get theme statistics
+        $stats = Theme::getThemeStats(Theme::getCurrentTheme());
+        
+        // Prepare data with helper functions
+        $data = [
+            'title' => 'Welcome to ' . get_random_company(),
+            'description' => 'A beautiful site created on ' . human_date(now()),
+            'stats' => $stats,
+            'isMobile' => is_mobile(),
+            'browserInfo' => get_browser_info(),
+            'randomQuote' => get_random_quote()
+        ];
+        
+        return Theme::view('home.index', $data);
+    }
+}
+```
+
+This comprehensive set of helper functions makes your Laravel Themes package incredibly powerful and user-friendly! Users can now build sophisticated themes with minimal custom code, using these built-in utilities for common tasks.
+
+## 🎓 How to Use - Complete Tutorial
+
+### 🚀 Getting Started - Step by Step
+
+#### 1. **Installation & Setup**
+
+```bash
+# Install the package
+composer require ayra/laravel-themes
+
+# Publish configuration
+php artisan vendor:publish --provider="Ayra\Theme\ThemeServiceProvider"
+
+# Add to .env file
+echo "APP_THEME=default" >> .env
+echo "APP_THEME_LAYOUT=main" >> .env
+echo "APP_THEME_DIR=public/themes" >> .env
+
+# Create your first theme
+php artisan theme:create default
+```
+
+#### 2. **Basic Theme Structure**
+
+After running `php artisan theme:create default`, you'll have:
+
+```
+public/themes/default/
+├── assets/
+│   ├── css/
+│   │   └── style.css
+│   ├── js/
+│   │   └── script.js
+│   └── img/
+├── layouts/
+│   └── layout.blade.php
+├── partials/
+│   ├── header.blade.php
+│   ├── footer.blade.php
+│   └── sections/
+│       └── main.blade.php
+├── views/
+│   └── index.blade.php
+├── widgets/
+├── theme.json
+└── config.php
+```
+
+#### 3. **Create Your First Layout**
+
+```php
+{{-- public/themes/default/layouts/layout.blade.php --}}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ Theme::get('title', 'My Website') }}</title>
+    
+    {!! meta_init() !!}
+    @styles()
+</head>
+<body>
+    @partial('header')
+    
+    <main>
+        @content()
+    </main>
+    
+    @partial('footer')
+    
+    @scripts()
+</body>
+</html>
+```
+
+#### 4. **Create Header Partial**
+
+```php
+{{-- public/themes/default/partials/header.blade.php --}}
+<header class="site-header">
+    <nav class="main-nav">
+        <div class="logo">
+            <a href="/">{{ Theme::get('site_name', 'My Site') }}</a>
+        </div>
+        
+        <ul class="nav-menu">
+            <li><a href="/">Home</a></li>
+            <li><a href="/about">About</a></li>
+            <li><a href="/contact">Contact</a></li>
+        </ul>
+        
+        {{-- Device-specific navigation --}}
+        @if(is_mobile())
+            <div class="mobile-menu-toggle">☰</div>
+        @endif
+    </nav>
+    
+    {{-- Breadcrumbs --}}
+    {!! Theme::breadcrumb()->render() !!}
+</header>
+```
+
+#### 5. **Create Main Content Section**
+
+```php
+{{-- public/themes/default/partials/sections/main.blade.php --}}
+<section class="main-content">
+    <div class="container">
+        <h1>{{ $title ?? 'Welcome' }}</h1>
+        
+        @if(isset($description))
+            <p class="lead">{{ $description }}</p>
+        @endif
+        
+        {{-- Show last updated time --}}
+        @if(isset($lastUpdated))
+            <p class="text-muted">
+                <small>Last updated: {{ human_date($lastUpdated) }}</small>
+            </p>
+        @endif
+        
+        {{-- Content area --}}
+        <div class="content">
+            @yield('content')
+        </div>
+    </div>
+</section>
+```
+
+#### 6. **Create Footer Partial**
+
+```php
+{{-- public/themes/default/partials/footer.blade.php --}}
+<footer class="site-footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>About Us</h3>
+                <p>{{ Theme::get('footer_about', 'A beautiful website built with Laravel Themes.') }}</p>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Contact</h3>
+                <p>Email: {!! protectEmail('contact@example.com') !!}</p>
+                <p>Phone: {{ mask_phone('+1-555-123-4567') }}</p>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="/privacy">Privacy Policy</a></li>
+                    <li><a href="/terms">Terms of Service</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; {{ date('Y') }} {{ get_random_company() }}. All rights reserved.</p>
+            <p>Generated in {{ format_bytes(memory_get_peak_usage()) }}</p>
+        </div>
+    </div>
+</footer>
+```
+
+#### 7. **Create Your First View**
+
+```php
+{{-- public/themes/default/views/index.blade.php --}}
+@extends('theme::layouts.layout')
+
+@section('content')
+<div class="welcome-section">
+    <h1>{{ $title ?? 'Welcome to Our Site' }}</h1>
+    
+    @if(isset($description))
+        <p class="lead">{{ $description }}</p>
+    @endif
+    
+    {{-- Show random quote --}}
+    <blockquote class="inspirational-quote">
+        "{{ get_random_quote() }}"
+    </blockquote>
+    
+    {{-- Device-specific content --}}
+    @if(is_mobile())
+        <div class="mobile-features">
+            <h3>Mobile Optimized</h3>
+            <p>This site is optimized for mobile devices!</p>
+        </div>
+    @elseif(is_tablet())
+        <div class="tablet-features">
+            <h3>Tablet Friendly</h3>
+            <p>Perfect for tablet users!</p>
+        </div>
+    @else
+        <div class="desktop-features">
+            <h3>Desktop Experience</h3>
+            <p>Full desktop experience with advanced features!</p>
+        </div>
+    @endif
+    
+    {{-- Theme statistics --}}
+    @if(isset($stats))
+        <div class="theme-stats">
+            <h3>Theme Statistics</h3>
+            <ul>
+                <li>Views: {{ $stats['views'] }}</li>
+                <li>Partials: {{ $stats['partials'] }}</li>
+                <li>Assets: {{ $stats['assets'] }}</li>
+                <li>Layouts: {{ $stats['layouts'] }}</li>
+                <li>Widgets: {{ $stats['widgets'] }}</li>
+            </ul>
+        </div>
+    @endif
+</div>
+@endsection
+```
+
+#### 8. **Configure Your Theme**
+
+```php
+{{-- public/themes/default/config.php --}}
+<?php
+
+return [
+    'events' => [
+        'before' => function($theme) {
+            // Set dynamic title with current date
+            $theme->setTitle('My Beautiful Theme - ' . format_date(now(), 'F Y'));
+            
+            // Set meta information
+            $theme->setDescription('A stunning theme created on ' . human_date(now()));
+            $theme->setAuthor('Your Name');
+            $theme->setKeywords('laravel, themes, beautiful, responsive');
+            
+            // Set site information
+            $theme->set('site_name', 'My Awesome Site');
+            $theme->set('footer_about', 'Building amazing websites with Laravel Themes.');
+            
+            // Set breadcrumb template
+            $theme->breadcrumb()->setTemplate('
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        @foreach($crumbs as $i => $crumb)
+                            @if($i != (count($crumbs) - 1))
+                                <li class="breadcrumb-item">
+                                    <a href="{{ $crumb["url"] }}">{{ $crumb["label"] }}</a>
+                                </li>
+                            @else
+                                <li class="breadcrumb-item active">{{ $crumb["label"] }}</li>
+                            @endif
+                        @endforeach
+                    </ol>
+                </nav>
+            ');
+        },
+        
+        'asset' => function($asset) {
+            // Add theme-specific assets
+            $asset->themePath()->add([
+                ['style', 'css/style.css'],
+                ['script', 'js/script.js']
+            ]);
+            
+            // Add versioned assets
+            $asset->addVersioned('main', 'css/main.css');
+            $asset->addVersioned('app', 'js/app.js');
+            
+            // Add conditional assets based on device
+            if (is_mobile()) {
+                $asset->addConditional('mobile', 'mobile-css', 'css/mobile.css');
+                $asset->addConditional('mobile', 'mobile-js', 'js/mobile.js');
+            } elseif (is_tablet()) {
+                $asset->addConditional('tablet', 'tablet-css', 'css/tablet.css');
+            } else {
+                $asset->addConditional('desktop', 'desktop-css', 'css/desktop.css');
+                $asset->addConditional('desktop', 'desktop-js', 'js/desktop.js');
+            }
+            
+            // Add CDN assets
+            $asset->enableCdn('https://cdnjs.cloudflare.com');
+            $asset->add('bootstrap', 'css/bootstrap.min.css');
+            $asset->add('jquery', 'js/jquery.min.js');
+            $asset->disableCdn();
+            
+            // Add assets with integrity (SRI)
+            $asset->addWithIntegrity('bootstrap', 'css/bootstrap.min.css', 'sha384-...');
+        }
+    ]
+];
+```
+
+#### 9. **Create Your Controller**
+
+```php
+<?php
+
+namespace App\Http\Controllers;
+
+use Ayra\Theme\Facades\Theme;
+
+class HomeController extends Controller
+{
+    public function index()
+    {
+        // Switch theme based on user preference or request
+        if (request()->has('theme')) {
+            Theme::switch(request()->get('theme'), true);
+        }
+        
+        // Get current theme information
+        $currentTheme = Theme::getCurrentTheme();
+        $themeStats = Theme::getThemeStats($currentTheme);
+        
+        // Prepare data with helper functions
+        $data = [
+            'title' => 'Welcome to ' . get_random_company(),
+            'description' => 'A beautiful and responsive website built with Laravel Themes. Created on ' . human_date(now()),
+            'lastUpdated' => now(),
+            'stats' => $themeStats,
+            'isMobile' => is_mobile(),
+            'isTablet' => is_tablet(),
+            'isDesktop' => is_desktop(),
+            'browserInfo' => get_browser_info(),
+            'clientIP' => get_client_ip(),
+            'countryCode' => get_country_code(),
+            'randomQuote' => get_random_quote(),
+            'randomName' => get_random_name(),
+            'randomEmail' => get_random_email(),
+            'randomCompany' => get_random_company()
+        ];
+        
+        return Theme::view('index', $data);
+    }
+    
+    public function about()
+    {
+        // Set breadcrumbs
+        Theme::breadcrumb()
+            ->add('Home', '/')
+            ->add('About', '/about');
+        
+        $data = [
+            'title' => 'About Us',
+            'description' => 'Learn more about our company and mission.',
+            'team' => [
+                get_random_name(),
+                get_random_name(),
+                get_random_name()
+            ]
+        ];
+        
+        return Theme::view('about', $data);
+    }
+    
+    public function contact()
+    {
+        // Set breadcrumbs
+        Theme::breadcrumb()
+            ->add('Home', '/')
+            ->add('Contact', '/contact');
+        
+        $data = [
+            'title' => 'Contact Us',
+            'description' => 'Get in touch with our team.',
+            'contactInfo' => [
+                'email' => 'contact@example.com',
+                'phone' => '+1-555-123-4567',
+                'address' => get_random_address()
+            ]
+        ];
+        
+        return Theme::view('contact', $data);
+    }
+}
+```
+
+#### 10. **Add Routes**
+
+```php
+{{-- routes/web.php --}}
+<?php
+
+use App\Http\Controllers\HomeController;
+
+Route::get('/', [HomeController::class, 'index']);
+Route::get('/about', [HomeController::class, 'index']);
+Route::get('/contact', [HomeController::class, 'contact']);
+
+// Theme preview routes
+Route::get('/preview/{theme}', function($theme) {
+    Theme::switch($theme, false);
+    return Theme::view('index');
+})->middleware('theme.preview');
+
+// Admin routes with specific theme
+Route::group(['middleware' => 'theme:admin,admin-layout'], function () {
+    Route::get('/admin', function () {
+        return Theme::view('admin.dashboard');
+    });
+});
+
+// Mobile routes with mobile theme
+Route::group(['middleware' => 'theme:mobile,mobile-layout'], function () {
+    Route::get('/mobile', function () {
+        return Theme::view('mobile.home');
+    });
+});
+```
+
+### 🎨 **Advanced Theme Features**
+
+#### **Creating Multiple Themes**
+
+```bash
+# Create different themes for different purposes
+php artisan theme:create admin
+php artisan theme:create mobile
+php artisan theme:create corporate
+php artisan theme:create blog
+```
+
+#### **Theme Switching in Real-Time**
+
+```php
+// In your controller or middleware
+public function switchTheme(Request $request)
+{
+    $theme = $request->get('theme');
+    
+    if (Theme::exists($theme)) {
+        Theme::switch($theme, true);
+        
+        // Redirect back with success message
+        return redirect()->back()->with('success', "Theme switched to {$theme}");
+    }
+    
+    return redirect()->back()->with('error', 'Theme not found');
+}
+
+// Add theme switcher to your layout
+<div class="theme-switcher">
+    <h4>Choose Theme:</h4>
+    @foreach(Theme::getAvailableThemes() as $themeName => $themeInfo)
+        <a href="{{ route('switch.theme', ['theme' => $themeName]) }}" 
+           class="theme-option {{ Theme::isActive($themeName) ? 'active' : '' }}">
+            {{ $themeInfo['name'] ?? $themeName }}
+        </a>
+    @endforeach
+</div>
+```
+
+#### **Creating Widgets**
+
+```bash
+# Create a global widget
+php artisan theme:widget UserProfile --global
+
+# Create a theme-specific widget
+php artisan theme:widget RecentPosts default
+```
+
+```php
+{{-- app/Widgets/WidgetUserProfile.php --}}
+<?php
+
+namespace App\Widgets;
+
+use Ayra\Theme\Widget;
+
+class WidgetUserProfile extends Widget
+{
+    public function render($data = [])
+    {
+        $user = $data['user'] ?? auth()->user();
+        
+        if (!$user) {
+            return '';
+        }
+        
+        return view('widgets.user-profile', [
+            'user' => $user,
+            'lastSeen' => human_date($user->last_seen_at),
+            'memberSince' => human_date($user->created_at)
+        ]);
+    }
+}
+
+{{-- resources/views/widgets/user-profile.blade.php --}}
+<div class="user-profile-widget">
+    <div class="user-avatar">
+        <img src="{{ get_gravatar_url($user->email, 100) }}" alt="{{ $user->name }}">
+    </div>
+    
+    <div class="user-info">
+        <h4>{{ $user->name }}</h4>
+        <p>Member since {{ $memberSince }}</p>
+        <p>Last seen {{ $lastSeen }}</p>
+    </div>
+</div>
+```
+
+#### **Using Widgets in Your Views**
+
+```php
+{{-- In your Blade templates --}}
+<div class="sidebar">
+    @widget('user-profile', ['user' => auth()->user()])
+    @widget('recent-posts', ['limit' => 5])
+</div>
+```
+
+### 🔧 **Asset Management Examples**
+
+#### **Advanced Asset Configuration**
+
+```php
+// In your theme config.php
+'asset' => function($asset) {
+    // Enable CDN for production
+    if (app()->environment('production')) {
+        $asset->enableCdn('https://cdn.example.com');
+    }
+    
+    // Add core assets
+    $asset->add('bootstrap', 'css/bootstrap.min.css');
+    $asset->add('jquery', 'js/jquery.min.js', ['bootstrap']);
+    
+    // Add theme assets with versioning
+    $asset->addVersioned('main', 'css/main.css');
+    $asset->addVersioned('app', 'js/app.js');
+    
+    // Add conditional assets based on device
+    if (is_mobile()) {
+        $asset->addConditional('mobile', 'mobile-css', 'css/mobile.css');
+        $asset->addConditional('mobile', 'mobile-js', 'js/mobile.js');
+    }
+    
+    // Add assets with integrity
+    $asset->addWithIntegrity('bootstrap', 'css/bootstrap.min.css', 'sha384-...');
+    
+    // Disable CDN
+    $asset->disableCdn();
+}
+```
+
+#### **Asset Containers**
+
+```php
+// Create named containers for different sections
+$asset->container('header')->add('header-css', 'css/header.css');
+$asset->container('footer')->add('footer-js', 'js/footer.js');
+
+// In your Blade templates
+@styles('header')
+@scripts('footer')
+```
+
+### 📱 **Responsive Design with Device Detection**
+
+#### **Device-Specific Content**
+
+```php
+{{-- In your Blade templates --}}
+@if(is_mobile())
+    <div class="mobile-navigation">
+        <button class="menu-toggle">☰</button>
+        <nav class="mobile-menu">
+            <a href="/">Home</a>
+            <a href="/about">About</a>
+            <a href="/contact">Contact</a>
+        </nav>
+    </div>
+@elseif(is_tablet())
+    <div class="tablet-navigation">
+        <nav class="tablet-menu">
+            <a href="/">Home</a>
+            <a href="/about">About</a>
+            <a href="/contact">Contact</a>
+        </nav>
+    </div>
+@else
+    <div class="desktop-navigation">
+        <nav class="desktop-menu">
+            <a href="/">Home</a>
+            <a href="/about">About</a>
+            <a href="/contact">Contact</a>
+            <a href="/blog">Blog</a>
+            <a href="/portfolio">Portfolio</a>
+        </nav>
+    </div>
+@endif
+```
+
+#### **Device-Specific Assets**
+
+```php
+// In your theme config
+if (is_mobile()) {
+    $asset->addConditional('mobile', 'mobile-css', 'css/mobile.css');
+    $asset->addConditional('mobile', 'mobile-js', 'js/mobile.js');
+} elseif (is_tablet()) {
+    $asset->addConditional('tablet', 'tablet-css', 'css/tablet.css');
+} else {
+    $asset->addConditional('desktop', 'desktop-css', 'css/desktop.css');
+    $asset->addConditional('desktop', 'desktop-js', 'js/desktop.js');
+}
+
+// In your Blade templates
+@foreach(Theme::asset()->getConditionalAssets('mobile') as $name => $asset)
+    <link rel="stylesheet" href="{{ asset($asset['path']) }}">
+@endforeach
+```
+
+### 🎯 **Real-World Use Cases**
+
+#### **E-commerce Theme**
+
+```php
+// Theme switching based on user preference
+if (auth()->check() && auth()->user()->theme_preference) {
+    Theme::switch(auth()->user()->theme_preference, true);
+}
+
+// Seasonal themes
+$currentMonth = date('n');
+if (in_array($currentMonth, [11, 12])) {
+    Theme::switch('christmas', false); // Don't persist seasonal themes
+} elseif (in_array($currentMonth, [10])) {
+    Theme::switch('halloween', false);
+}
+
+// Device-specific product display
+if (is_mobile()) {
+    $productsPerPage = 6;
+    $view = 'mobile.product-grid';
+} else {
+    $productsPerPage = 12;
+    $view = 'desktop.product-grid';
+}
+```
+
+#### **Blog Theme**
+
+```php
+// Dynamic meta tags
+$metaTags = [
+    'title' => $post->title,
+    'description' => truncate($post->excerpt, 160),
+    'keywords' => implode(', ', $post->tags->pluck('name')->toArray()),
+    'author' => $post->author->name,
+    'image' => $post->featured_image,
+    'url' => request()->url()
+];
+
+// SEO optimization
+{!! seo_tags($metaTags['title'], $metaTags['description'], $metaTags['keywords'], $metaTags['author'], $metaTags['image'], $metaTags['url']) !!}
+
+// Reading time estimation
+$wordCount = str_word_count(strip_tags($post->content));
+$readingTime = ceil($wordCount / 200); // 200 words per minute
+```
+
+#### **Corporate Theme**
+
+```php
+// Company information
+$companyInfo = [
+    'name' => get_random_company(),
+    'founded' => '1995',
+    'employees' => format_number(rand(50, 1000)),
+    'revenue' => format_currency(rand(1000000, 10000000), 'USD')
+];
+
+// Team member cards
+@foreach($team as $member)
+    <div class="team-member">
+        <img src="{{ get_gravatar_url($member->email, 200) }}" alt="{{ $member->name }}">
+        <h3>{{ $member->name }}</h3>
+        <p>{{ $member->position }}</p>
+        <p>Member since {{ human_date($member->joined_at) }}</p>
+    </div>
+@endforeach
+```
+
+### 🚀 **Performance Optimization**
+
+#### **Asset Optimization**
+
+```php
+// Enable optimization in production
+if (app()->environment('production')) {
+    Theme::asset()->optimize(true);
+}
+
+// Use CDN for external assets
+$asset->enableCdn('https://cdn.example.com');
+$asset->add('bootstrap', 'css/bootstrap.min.css');
+$asset->disableCdn();
+
+// Asset versioning for cache busting
+$asset->addVersioned('main', 'css/main.css');
+```
+
+#### **Conditional Loading**
+
+```php
+// Load heavy assets only when needed
+if (request()->routeIs('blog.*')) {
+    $asset->addConditional('blog', 'blog-css', 'css/blog.css');
+    $asset->addConditional('blog', 'blog-js', 'js/blog.js');
+}
+
+if (request()->routeIs('admin.*')) {
+    $asset->addConditional('admin', 'admin-css', 'css/admin.css');
+    $asset->addConditional('admin', 'admin-js', 'js/admin.js');
+}
+```
+
+### 🔒 **Security Features**
+
+#### **Email Protection**
+
+```php
+// Protect email addresses from bots
+<p>Contact us at: {!! protectEmail('contact@example.com') !!}</p>
+
+// Mask sensitive information
+<p>Phone: {{ mask_phone('+1-555-123-4567') }}</p>
+<p>Email: {{ mask_email('user@example.com') }}</p>
+```
+
+#### **Asset Integrity**
+
+```php
+// Add SRI (Subresource Integrity) for external assets
+$asset->addWithIntegrity('bootstrap', 'css/bootstrap.min.css', 'sha384-...');
+```
+
+### 📊 **Monitoring & Analytics**
+
+#### **Theme Usage Statistics**
+
+```php
+// Get theme statistics
+$stats = Theme::getThemeStats('default');
+
+// Display in admin panel
+<div class="theme-stats">
+    <h3>Theme Statistics</h3>
+    <ul>
+        <li>Views: {{ $stats['views'] }}</li>
+        <li>Partials: {{ $stats['partials'] }}</li>
+        <li>Assets: {{ $stats['assets'] }}</li>
+        <li>Layouts: {{ $stats['layouts'] }}</li>
+        <li>Widgets: {{ $stats['widgets'] }}</li>
+    </ul>
+</div>
+
+// Track theme usage
+$themes = Theme::getAvailableThemes();
+foreach ($themes as $themeName => $themeInfo) {
+    $usageCount = Theme::getThemeStats($themeName);
+    // Store in database for analytics
+}
+```
+
+### 🎨 **Customization Tips**
+
+#### **Creating Custom Helpers**
+
+```php
+// In your theme's config.php or a custom helper file
+if (!function_exists('theme_specific_helper')) {
+    function theme_specific_helper($value) {
+        return 'Theme: ' . $value;
+    }
+}
+
+// Use in your views
+{{ theme_specific_helper('Hello World') }}
+```
+
+#### **Extending Theme Classes**
+
+```php
+// Create custom theme class
+class CustomTheme extends \Ayra\Theme\Theme
+{
+    public function customMethod()
+    {
+        return 'Custom functionality';
+    }
+}
+
+// Register in service provider
+$this->app->singleton('theme', function($app) {
+    return new CustomTheme($app['config'], $app['events'], $app['view'], $app['asset'], $app['files'], $app['breadcrumb'], $app['manifest']);
+});
+```
+
+This comprehensive tutorial shows you exactly how to use every feature of the Laravel Themes package! From basic setup to advanced customization, you now have everything you need to build amazing, responsive themes.

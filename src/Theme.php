@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\Cookie;
 use Ayra\Theme\Contracts\Theme as ThemeContract;
 use Ayra\Theme\Manifest;
 use Illuminate\Support\Arr;
-use Opis\Closure\SerialiazbleClosure;
+
 class Theme implements ThemeContract
 {
     /**
@@ -1269,6 +1269,170 @@ class Theme implements ThemeContract
         }
 
         trigger_error('Call to undefined method '.__CLASS__.'::'.$method.'()', E_USER_ERROR);
+    }
+
+    /**
+     * Switch theme with session/cookie support
+     *
+     * @param string $theme
+     * @param bool $persist
+     * @return $this
+     */
+    public function switch($theme, $persist = true)
+    {
+        $this->theme = $theme;
+        
+        if ($persist) {
+            if (session_status() === PHP_SESSION_ACTIVE) {
+                session(['laravel_theme' => $theme]);
+            }
+            
+            if (request()->hasCookie('laravel_theme')) {
+                cookie()->queue('laravel_theme', $theme, 60 * 24 * 30); // 30 days
+            }
+        }
+        
+        return $this;
+    }
+
+    /**
+     * Get current theme from session/cookie
+     *
+     * @return string|null
+     */
+    public function getCurrentTheme()
+    {
+        if (session_status() === PHP_SESSION_ACTIVE && session('laravel_theme')) {
+            return session('laravel_theme');
+        }
+        
+        if (request()->hasCookie('laravel_theme')) {
+            return request()->cookie('laravel_theme');
+        }
+        
+        return $this->theme;
+    }
+
+    /**
+     * Clear theme session/cookie
+     *
+     * @return $this
+     */
+    public function clearTheme()
+    {
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            session()->forget('laravel_theme');
+        }
+        
+        if (request()->hasCookie('laravel_theme')) {
+            cookie()->queue(cookie()->forget('laravel_theme'));
+        }
+        
+        return $this;
+    }
+
+    /**
+     * Check if theme is active
+     *
+     * @param string $theme
+     * @return bool
+     */
+    public function isActive($theme)
+    {
+        return $this->getCurrentTheme() === $theme;
+    }
+
+    /**
+     * Get theme preview URL
+     *
+     * @param string $theme
+     * @param string $route
+     * @return string
+     */
+    public function getPreviewUrl($theme, $route = '/')
+    {
+        return url($route) . '?theme=' . $theme;
+    }
+
+    /**
+     * Get all available themes
+     *
+     * @return array
+     */
+    public function getAvailableThemes()
+    {
+        $themes = [];
+        $themePath = $this->config->get('theme.themeDir', 'public/themes');
+        $fullPath = base_path($themePath);
+        
+        if ($this->files->isDirectory($fullPath)) {
+            $directories = $this->files->directories($fullPath);
+            
+            foreach ($directories as $directory) {
+                $themeName = basename($directory);
+                $manifestPath = $directory . '/theme.json';
+                
+                if ($this->files->exists($manifestPath)) {
+                    $manifest = json_decode($this->files->get($manifestPath), true);
+                    $themes[$themeName] = $manifest ?: ['name' => $themeName];
+                } else {
+                    $themes[$themeName] = ['name' => $themeName];
+                }
+            }
+        }
+        
+        return $themes;
+    }
+
+    /**
+     * Get theme statistics
+     *
+     * @param string $theme
+     * @return array
+     */
+    public function getThemeStats($theme)
+    {
+        $themePath = $this->config->get('theme.themeDir', 'public/themes') . '/' . $theme;
+        $fullPath = base_path($themePath);
+        
+        if (!$this->files->isDirectory($fullPath)) {
+            return [];
+        }
+        
+        $stats = [
+            'views' => 0,
+            'partials' => 0,
+            'assets' => 0,
+            'layouts' => 0,
+            'widgets' => 0
+        ];
+        
+        // Count views
+        if ($this->files->isDirectory($fullPath . '/views')) {
+            $stats['views'] = count($this->files->allFiles($fullPath . '/views'));
+        }
+        
+        // Count partials
+        if ($this->files->isDirectory($fullPath . '/partials')) {
+            $stats['partials'] = count($this->files->allFiles($fullPath . '/partials'));
+        }
+        
+        // Count assets
+        if ($this->files->isDirectory($fullPath . '/assets')) {
+            $stats['assets'] = count($this->files->allFiles($fullPath . '/assets'));
+        }
+        
+        // Count layouts
+        if ($this->files->isDirectory($fullPath . '/layouts')) {
+            $stats['layouts'] = count($this->files->allFiles($fullPath . '/layouts'));
+        }
+        
+        // Count widgets
+        if ($this->files->isDirectory($fullPath . '/widgets')) {
+            $stats['widgets'] = count($this->files->allFiles($fullPath . '/widgets'));
+        }
+        
+        return $stats;
     }
 
 }
